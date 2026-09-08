@@ -22,6 +22,7 @@
         <module>observability-starter</module>
         <module>sample-bank-app</module>
         <module>audit-service</module>
+        <module>logging-api</module>
     </modules>
 
     <properties>

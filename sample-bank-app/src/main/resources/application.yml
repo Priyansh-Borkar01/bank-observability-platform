@@ -18,3 +18,6 @@ management:
 logging:
   level:
     root: INFO
+observability:
+  logging:
+    endpoint: http://localhost:8090/api/v1/logs

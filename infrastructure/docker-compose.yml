@@ -49,3 +49,21 @@ services:
 
     depends_on:
       - prometheus
+
+  mysql:
+    image: mysql:8.4
+    container_name: mysql
+
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: observability
+      MYSQL_USER: npst
+      MYSQL_PASSWORD: npst123
+
+    ports:
+      - "3306:3306"
+
+    volumes:
+      - mysql_data:/var/lib/mysql
+volumes:
+  mysql_data:

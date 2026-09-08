@@ -17,4 +17,6 @@ public class AuditEvent {
     private int status;
     private long duration;
     private String timestamp;
+    private String bankCode;
+    private String environment;
 }
