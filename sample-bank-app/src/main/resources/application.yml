@@ -8,6 +8,13 @@ management:
       exposure:
         include: health,info,metrics,prometheus
 
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: sample-bank-app
+
 logging:
   level:
     root: INFO
