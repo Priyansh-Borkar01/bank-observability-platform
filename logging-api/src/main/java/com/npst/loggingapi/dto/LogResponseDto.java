@@ -1,12 +1,13 @@
 package com.npst.loggingapi.dto;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor
+@Builder
 public class LogResponseDto {
 
-    private String status;
-    private Long logId;
+    private boolean success;
+    private String traceId;
+    private String message;
 }

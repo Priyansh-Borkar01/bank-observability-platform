@@ -1,29 +1,37 @@
 package com.npst.loggingapi.controller;
 
+import com.npst.loggingapi.client.LokiClient;
+import com.npst.loggingapi.dto.EnrichedLogDto;
 import com.npst.loggingapi.dto.LogRequestDto;
 import com.npst.loggingapi.dto.LogResponseDto;
-import com.npst.loggingapi.service.LoggingService;
+import com.npst.loggingapi.service.LogEnrichmentService;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/logs")
 public class LoggingController {
 
-    private final LoggingService service;
+    private final LokiClient lokiClient;
 
-    public LoggingController(LoggingService service) {
-        this.service = service;
+    private final LogEnrichmentService enrichmentService;
+
+    public LoggingController(LokiClient lokiClient, LogEnrichmentService enrichmentService) {
+        this.lokiClient = lokiClient;
+        this.enrichmentService = enrichmentService;
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public LogResponseDto ingest(
-            @Valid @RequestBody LogRequestDto request) {
+    public LogResponseDto ingest(@Valid @RequestBody LogRequestDto request) throws Exception {
 
-        Long id = service.save(request);
+        EnrichedLogDto enriched = enrichmentService.enrich(request);
 
-        return new LogResponseDto("SUCCESS", id);
+        lokiClient.push(enriched);
+
+        return LogResponseDto.builder()
+                .success(true)
+                .traceId(enriched.getTraceId())
+                .message("Application log accepted")
+                .build();
     }
 }

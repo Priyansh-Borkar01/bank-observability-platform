@@ -5,6 +5,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "observability.bank")
 public class BankProperties {
 
+
+
     private String code;
     private String name;
     private String environment;

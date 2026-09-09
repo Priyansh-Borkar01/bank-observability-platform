@@ -2,6 +2,7 @@ package com.npst.observability.config;
 
 import com.npst.observability.client.AuditClient;
 import com.npst.observability.client.TraceRestTemplateInterceptor;
+import com.npst.observability.config.bank.BankProperties;
 import com.npst.observability.filter.TraceFilter;
 import com.npst.observability.interceptor.LoggingInterceptor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -12,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 
 @Configuration
-@EnableConfigurationProperties(ObservabilityProperties.class)
+@EnableConfigurationProperties({ObservabilityProperties.class, BankProperties.class})
 public class ObservabilityAutoConfiguration {
 
 
