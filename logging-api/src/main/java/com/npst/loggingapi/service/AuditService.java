@@ -1,66 +1,116 @@
 package com.npst.loggingapi.service;
 
+import com.npst.loggingapi.dto.AuditSearchRequest;
+import com.npst.loggingapi.dto.AuditSearchResponse;
+import com.npst.loggingapi.dto.PageResponse;
 import com.npst.loggingapi.entity.AuditLogEntity;
 import com.npst.loggingapi.repository.AuditLogRepository;
 import com.npst.observability.audit.schema.AuditEvent;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class AuditService {
 
-    private final AuditLogRepository repository;
+    private final AuditLogRepository auditLogRepository;
 
-    public AuditService(AuditLogRepository repository) {
-        this.repository = repository;
+    public AuditService(AuditLogRepository auditLogRepository) {
+        this.auditLogRepository = auditLogRepository;
     }
 
+    // =========================
+    // SAVE AUDIT
+    // =========================
     public void save(AuditEvent event) throws Exception {
 
+        event.setEventHash(generateEventHash(event));
 
-        if (repository.existsByEventHash(event.getEventHash())) {
-            return;   // Ignore duplicate event
-        }
-        String hash = generateEventHash(event);
-        if (repository.existsByEventHash(hash)) {
-            return; // duplicate request
+        if (auditLogRepository.existsByEventHash(event.getEventHash())) {
+            return;
         }
 
         AuditLogEntity entity = AuditLogEntity.builder()
+                .id(UUID.randomUUID().toString())
                 .traceId(event.getTraceId())
-                .eventHash(hash)
-
+                .customerId(event.getCustomerId())
                 .actorId(event.getActorId())
                 .actorType(event.getActorType())
-                .customerId(event.getCustomerId())
-
                 .module(event.getModule().name())
                 .action(event.getAction().name())
-
                 .entity(event.getEntity())
                 .entityId(event.getEntityId())
                 .description(event.getDescription())
-
                 .deviceId(event.getDeviceId())
                 .deviceType(event.getDeviceType())
                 .ipAddress(event.getIpAddress())
                 .mobileNumber(event.getMobileNumber())
-
-                .statusCode(event.getStatusCode())
-                .responseMessage(event.getResponseMessage())
-
                 .bankCode(event.getBankCode())
                 .environment(event.getEnvironment())
-
+                .responseMessage(event.getResponseMessage())
+                .statusCode(event.getStatusCode())
+                .eventHash(event.getEventHash())
                 .createdAt(Instant.now())
                 .build();
 
-        repository.save(entity);
+        auditLogRepository.save(entity);
     }
 
+    // =========================
+    // SEARCH AUDITS (PAGINATED)
+    // =========================
+    public PageResponse<AuditSearchResponse> search(
+            AuditSearchRequest request,
+            int page,
+            int size) {
+
+        PageRequest pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by("createdAt").descending()
+        );
+
+        Page<AuditLogEntity> logs = auditLogRepository.search(
+                request.getCustomerId(),
+                request.getModule(),
+                request.getAction(),
+                request.getTraceId(),
+                pageable
+        );
+
+        List<AuditSearchResponse> response = logs.getContent()
+                .stream()
+                .map(log -> AuditSearchResponse.builder()
+                        .traceId(log.getTraceId())
+                        .customerId(log.getCustomerId())
+                        .module(log.getModule())
+                        .action(log.getAction())
+                        .entity(log.getEntity())
+                        .description(log.getDescription())
+                        .createdAt(log.getCreatedAt())
+                        .build())
+                .toList();
+
+        return PageResponse.<AuditSearchResponse>builder()
+                .content(response)
+                .page(logs.getNumber())
+                .size(logs.getSize())
+                .totalElements(logs.getTotalElements())
+                .totalPages(logs.getTotalPages())
+                .first(logs.isFirst())
+                .last(logs.isLast())
+                .build();
+    }
+
+    // =========================
+    // SHA-256 HASH
+    // =========================
     private String generateEventHash(AuditEvent event) throws Exception {
 
         String payload = String.join("|",
@@ -74,12 +124,11 @@ public class AuditService {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         byte[] hash = digest.digest(payload.getBytes());
 
-        StringBuilder hex = new StringBuilder();
-
+        StringBuilder sb = new StringBuilder();
         for (byte b : hash) {
-            hex.append(String.format("%02x", b));
+            sb.append(String.format("%02x", b));
         }
 
-        return hex.toString();
+        return sb.toString();
     }
 }
