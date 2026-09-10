@@ -26,8 +26,9 @@ public class TraceFilter extends OncePerRequestFilter {
         if (traceId == null || traceId.isBlank()) {
             traceId = UUID.randomUUID().toString();
         }
-        request.setAttribute("traceId", traceId);
+
         MDC.put("traceId", traceId);
+        request.setAttribute("traceId", traceId);
         //MDC.put("traceId", traceId);
         response.setHeader("X-Trace-Id", traceId);
 

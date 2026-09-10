@@ -18,3 +18,16 @@ management:
   metrics:
     tags:
       application: audit-service
+
+observability:
+  logging:
+    endpoint: http://localhost:8090/api/v1/logs
+
+  audit:
+    endpoint: http://localhost:8081/api/v1/audit
+
+bank:
+  code: NPST
+  name: NPST Bank
+  environment: UAT
+  region: IN

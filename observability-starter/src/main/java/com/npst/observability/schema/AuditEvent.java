@@ -1,78 +1,23 @@
 package com.npst.observability.schema;
 
-public class AuditEvent extends LogEvent {
+import lombok.*;
 
-    private String actorId;
-    private String actorType;
-    private AuditAction action;
-    private String entity;
-    private String entityId;
-    private String description;
-    private String bankCode;
-    private String environment;
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class AuditEvent {
 
-    public AuditEvent() {
-        setEventType(EventType.AUDIT);
-    }
+    private String traceId;
 
-    public String getActorId() {
-        return actorId;
-    }
+    private String method;
 
-    public void setActorId(String actorId) {
-        this.actorId = actorId;
-    }
+    private String uri;
 
-    public String getActorType() {
-        return actorType;
-    }
+    private Integer status;
 
-    public void setActorType(String actorType) {
-        this.actorType = actorType;
-    }
+    private Long duration;
 
-    public AuditAction getAction() {
-        return action;
-    }
+    private String timestamp;
 
-    public void setAction(AuditAction action) {
-        this.action = action;
-    }
-
-    public String getEntity() {
-        return entity;
-    }
-
-    public void setEntity(String entity) {
-        this.entity = entity;
-    }
-
-    public String getEntityId() {
-        return entityId;
-    }
-
-    public void setEntityId(String entityId) {
-        this.entityId = entityId;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getBankCode() {
-        return bankCode;
-    }
-    public void setBankCode(String bankCode) {
-        this.bankCode = bankCode;
-    }
-    public String getEnvironment() {
-        return environment;
-    }
-    public void setEnvironment(String environment) {
-        this.environment = environment;
-    }
 }

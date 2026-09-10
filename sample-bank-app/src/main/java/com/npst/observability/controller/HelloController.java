@@ -1,6 +1,7 @@
 package com.npst.observability.controller;
-
-import com.npst.observability.schema.AuditAction;
+import com.npst.observability.audit.annotation.AuditLog;
+import com.npst.observability.audit.registry.AuditAction;
+import com.npst.observability.audit.registry.AuditModule;
 import com.npst.observability.schema.AuditEvent;
 import com.npst.observability.logger.CommonLogger;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,13 @@ public class HelloController {
     public HelloController(CommonLogger commonLogger) {
         this.commonLogger = commonLogger;
     }
-
+    @AuditLog(
+            module = AuditModule.ACCOUNT,
+            action = AuditAction.BALANCE_VIEW,
+            entity = "HELLO_API",
+            entityId = "HELLO-001",
+            description = "Hello endpoint invoked"
+    )
     @GetMapping("/hello")
     public String hello() {
 
@@ -28,14 +35,6 @@ public class HelloController {
                 )
         );
 
-        commonLogger.audit(
-                "SYSTEM",
-                "SERVICE",
-                AuditAction.VIEW_CUSTOMER,
-                "HELLO_API",
-                "HELLO-001",
-                "Hello endpoint invoked"
-        );
 
         return "Hello API Success";
     }

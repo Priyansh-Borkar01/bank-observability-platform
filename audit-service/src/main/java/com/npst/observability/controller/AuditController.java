@@ -1,6 +1,6 @@
 package com.npst.observability.controller;
 
-import com.npst.observability.audit.AuditEvent;
+import com.npst.observability.schema.AuditEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;

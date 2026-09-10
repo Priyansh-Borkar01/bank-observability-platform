@@ -29,3 +29,5 @@ observability:
 
   logging:
     endpoint: http://localhost:8090/api/v1/logs
+  audit:
+      endpoint: http://localhost:8090/api/v1/audit
